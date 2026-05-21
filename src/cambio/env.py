@@ -96,7 +96,27 @@ class CambioEnv:
             scores[1] - scores[0],
             scores[0] - scores[1],
         ]
-    
+
+    def step(self, action: Action) -> GameState:
+        assert self.state is not None
+        if self.state.done:
+            raise ValueError("Cannot step when game is terminal.")
+
+        self._require_legal_action(action)
+
+        if self.state.phase == "start_turn":
+            self._handle_start_turn_action(action)
+            return self.state
+
+        if self.state.phase in {"after_draw_deck", "after_draw_discard"}:
+            self._handle_after_draw_action(action)
+            return self.state
+
+        if self.state.phase == "power_resolution":
+            self._handle_power_resolution_action(action)
+            return self.state
+
+        raise ValueError(f"Unknown phase: {self.state.phase}")
 
     def legal_actions(self, player_id: int) -> list[Action]:
         assert self.state is not None
@@ -108,7 +128,9 @@ class CambioEnv:
             return []
 
         if self.state.phase == "start_turn":
-            actions = [Action.make("draw_deck")]
+            actions = []
+            if self.state.deck:
+                actions.append(Action.make("draw_deck"))
 
             if self.state.discard_pile:
                 actions.append(Action.make("draw_discard"))
@@ -133,6 +155,9 @@ class CambioEnv:
             ]
 
         if self.state.phase == "power_resolution":
+            if self.state.drawn_card is None:
+                return []
+
             power = card_power(self.state.drawn_card)
             opponent_id = 1 - player_id
 
@@ -163,3 +188,139 @@ class CambioEnv:
                 ]
 
         return []
+
+    def _require_legal_action(self, action: Action) -> None:
+        assert self.state is not None
+        legal = set(self.legal_actions(self.state.current_player))
+        if action not in legal:
+            raise ValueError(f"Illegal action for current phase: {action.to_json()}")
+
+    def _handle_start_turn_action(self, action: Action) -> None:
+        assert self.state is not None
+        if action.kind == "draw_deck":
+            self.state.drawn_card = self.state.deck.pop()
+            self.state.phase = "after_draw_deck"
+            return
+
+        if action.kind == "draw_discard":
+            self.state.drawn_card = self.state.discard_pile.pop()
+            self.state.phase = "after_draw_discard"
+            return
+
+        if action.kind == "call_cambio":
+            self.state.cambio_called_by = self.state.current_player
+            self.state.final_turns_remaining = self.num_players - 1
+            self._advance_turn()
+            return
+
+        raise ValueError(f"Unhandled start_turn action kind: {action.kind}")
+
+    def _handle_after_draw_action(self, action: Action) -> None:
+        assert self.state is not None
+        if self.state.drawn_card is None:
+            raise ValueError("drawn_card must be set in draw resolution phases.")
+
+        if action.kind == "replace_self":
+            slot = action.get("slot")
+            if not isinstance(slot, int) or not (0 <= slot < 4):
+                raise ValueError("replace_self requires slot in [0, 3].")
+
+            player = self.state.players[self.state.current_player]
+            replaced = player.hand[slot]
+            player.hand[slot] = self.state.drawn_card
+            player.known_self_slots.add(slot)
+            self.state.discard_pile.append(replaced)
+            self._post_draw_resolution()
+            return
+
+        if action.kind == "discard_drawn":
+            self.state.discard_pile.append(self.state.drawn_card)
+            self._post_draw_resolution()
+            return
+
+        raise ValueError(f"Unhandled post-draw action kind: {action.kind}")
+
+    def _post_draw_resolution(self) -> None:
+        assert self.state is not None
+        assert self.state.drawn_card is not None
+        power = card_power(self.state.drawn_card)
+        if power is None:
+            self.state.drawn_card = None
+            self._advance_turn()
+            return
+
+        self.state.phase = "power_resolution"
+
+    def _handle_power_resolution_action(self, action: Action) -> None:
+        assert self.state is not None
+        if self.state.drawn_card is None:
+            raise ValueError("No drawn card available for power resolution.")
+
+        actor_id = self.state.current_player
+        opponent_id = 1 - actor_id
+        actor = self.state.players[actor_id]
+        opponent = self.state.players[opponent_id]
+        kind = action.kind
+
+        if kind == "peek_self":
+            slot = action.get("slot")
+            if not isinstance(slot, int) or not (0 <= slot < 4):
+                raise ValueError("peek_self requires slot in [0, 3].")
+            actor.known_self_slots.add(slot)
+
+        elif kind == "peek_opponent":
+            slot = action.get("slot")
+            if not isinstance(slot, int) or not (0 <= slot < 4):
+                raise ValueError("peek_opponent requires slot in [0, 3].")
+            actor.known_opp_cards[slot] = opponent.hand[slot]
+
+        elif kind in {"blind_swap", "king_swap"}:
+            my_slot = action.get("my_slot")
+            opp_slot = action.get("opp_slot")
+            if (
+                not isinstance(my_slot, int)
+                or not isinstance(opp_slot, int)
+                or not (0 <= my_slot < 4)
+                or not (0 <= opp_slot < 4)
+            ):
+                raise ValueError(f"{kind} requires my_slot/opp_slot in [0, 3].")
+
+            actor.hand[my_slot], opponent.hand[opp_slot] = opponent.hand[opp_slot], actor.hand[my_slot]
+
+            actor.known_opp_cards.pop(opp_slot, None)
+            opponent.known_opp_cards.pop(my_slot, None)
+
+            if kind == "blind_swap":
+                actor.known_self_slots.discard(my_slot)
+                opponent.known_self_slots.discard(opp_slot)
+            else:
+                actor.known_self_slots.add(my_slot)
+                actor.known_opp_cards[opp_slot] = opponent.hand[opp_slot]
+                opponent.known_self_slots.discard(opp_slot)
+
+        else:
+            raise ValueError(f"Unhandled power action kind: {kind}")
+
+        self.state.drawn_card = None
+        self._advance_turn()
+
+    def _advance_turn(self) -> None:
+        assert self.state is not None
+        just_finished = self.state.current_player
+        self.state.current_player = 1 - self.state.current_player
+        self.state.phase = "start_turn"
+        self.state.turn_count += 1
+        self.state.drawn_card = None
+
+        if self.state.cambio_called_by is None:
+            return
+
+        if just_finished == self.state.cambio_called_by:
+            return
+
+        if self.state.final_turns_remaining is None:
+            return
+
+        self.state.final_turns_remaining -= 1
+        if self.state.final_turns_remaining <= 0:
+            self.state.done = True
