@@ -1,4 +1,4 @@
-from src.cambio.cards import Card, make_deck, card_value, card_power
+from cambio.cards import Card, make_deck, card_value, card_power
 
 
 def test_deck_size_with_jokers():
