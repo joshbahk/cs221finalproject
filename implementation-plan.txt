@@ -1,0 +1,16 @@
+1. Build cards/scoring.
+2. Build actions.
+3. Build GameState and Observation.
+4. Build CambioEnv.
+5. Add legal actions.
+6. Add step transitions.
+7. Add RandomAgent and GreedyAgent.
+8. Add AGENT_REGISTRY.
+9. Add play_game().
+10. Add smoke_game.py.
+11. Add generate_dataset.py.
+12. Add evaluate_agents.py.
+13. Add make_figures.py.
+14. Add InformationSetMonteCarloAgent.
+15. Run final experiments.
+16. Write report from generated outputs.
