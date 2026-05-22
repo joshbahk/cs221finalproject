@@ -29,31 +29,43 @@ def remove_one_card(deck, target):
 
     raise ValueError(f"Could not remove card {target}")
 
-
 def sample_env_from_observation(observation, seed=None) -> CambioEnv:
     """
-    Sample on e ull Cambio environment consistent with the player's observation
+    Sample one possible full Cambio environment consistent with the player's observation.
 
-    The agent only receives an Observation -- creates one plausible hidden world that agrees with all known cards
+    The real game has hidden cards. The agent only receives an Observation.
+    This function creates one plausible hidden world that agrees with all known cards.
+
+    Important detail:
+    Sometimes the same physical card can appear both as drawn_card and inside
+    my_cards during power resolution. We should only remove each known physical
+    card once from the sampled deck.
     """
     rng = random.Random(seed)
     deck = make_deck(include_jokers=True)
 
     known_cards = []
 
+    def add_known_card(card):
+        if card is None:
+            return
+
+        # Non-joker cards are unique in the deck, so do not add duplicates.
+        # Jokers are not unique, so if both jokers are truly visible, allowing
+        # duplicates is okay.
+        if card.rank != "JOKER" and card in known_cards:
+            return
+
+        known_cards.append(card)
+
     for card in observation.my_cards:
-        if card is not None:
-            known_cards.append(card)
+        add_known_card(card)
 
     for card in observation.opponent_cards:
-        if card is not None:
-            known_cards.append(card)
+        add_known_card(card)
 
-    if observation.discard_top is not None:
-        known_cards.append(observation.discard_top)
-
-    if observation.drawn_card is not None:
-        known_cards.append(observation.drawn_card)
+    add_known_card(observation.discard_top)
+    add_known_card(observation.drawn_card)
 
     for card in known_cards:
         remove_one_card(deck, card)
