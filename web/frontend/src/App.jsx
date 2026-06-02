@@ -120,3 +120,10 @@ function App() {
 }
 
 export default App
+  return (
+    <div>
+      <h1>Cambio</h1>
+
+      <pre>{JSON.stringify(game, null, 2)}</pre>
+    </div>
+  );
