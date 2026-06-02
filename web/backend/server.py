@@ -32,7 +32,6 @@ env = CambioEnv(seed=42)
 bot = AGENTS["random"]()
 env.reset()
 
-#pulls state from observation
 
 @app.get("/agents")
 def list_agents():
@@ -48,8 +47,6 @@ def get_state():
         "done": env.is_terminal(),
     }
 
-#resetting the game
-
 @app.post("/reset")
 def reset(agent: str = "random"):
     global bot
@@ -59,7 +56,6 @@ def reset(agent: str = "random"):
     env.reset()
     return {"success": True}
 
-#taking an action
 
 @app.post("/action")
 def perform_action(action_data: dict):
