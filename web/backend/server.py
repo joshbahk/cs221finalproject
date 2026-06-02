@@ -1,6 +1,7 @@
 import sys
 from pathlib import Path
 
+# file path putting root node 
 ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / "src"
 
@@ -25,7 +26,7 @@ app.add_middleware(
 env = CambioEnv(seed=42)
 env.reset()
 
-
+#pulls state from observation
 @app.get("/state")
 def get_state():
     obs = env.get_observation(0)
@@ -38,14 +39,14 @@ def get_state():
         ],
     }
 
-
+#resetting the game
 @app.post("/reset")
 def reset():
     env.reset()
 
     return {"success": True}
 
-
+#taking an action
 @app.post("/action")
 def perform_action(action_data: dict):
 
@@ -53,7 +54,5 @@ def perform_action(action_data: dict):
         action_data["kind"],
         **action_data.get("params", {})
     )
-
     env.step(action)
-
     return {"success": True}
