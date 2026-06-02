@@ -1,5 +1,7 @@
 import { useGame } from "./useGame";
 import { Hand } from "./components/Hand";
+import { TableCenter } from "./components/TableCenter";
+import "./App.css";
 
 export default function App() {
   const { game, loading, error } = useGame();
@@ -16,6 +18,10 @@ export default function App() {
     <div className="game">
       <h1>Cambio</h1>
       <Hand cards={observation.opponent_cards} label="Opponent" />
+      <TableCenter
+        discardTop={observation.discard_top}
+        deckSize={observation.deck_size}
+      />
       <Hand cards={observation.my_cards} label="You" />
     </div>
   );

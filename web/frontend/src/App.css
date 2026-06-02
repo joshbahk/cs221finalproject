@@ -167,7 +167,7 @@
 
   &::before,
   &::after {
-    content: '';
+    content: "";
     position: absolute;
     top: -4.5px;
     border: 5px solid transparent;
@@ -181,4 +181,74 @@
     right: 0;
     border-right-color: var(--border);
   }
+}
+
+.game {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 32px 20px;
+}
+
+.hand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.hand-label {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text);
+}
+
+.hand-cards {
+  display: flex;
+  gap: 12px;
+}
+
+.card {
+  width: 60px;
+  height: 90px;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  font-family: var(--mono);
+  gap: 4px;
+}
+
+.card--hidden {
+  background: var(--code-bg);
+  color: var(--text);
+  font-size: 20px;
+}
+
+.card-rank {
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--text-h);
+}
+
+.card-suit {
+  font-size: 13px;
+  color: var(--text);
+}
+.table-center {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+}
+
+.table-pile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
 }
