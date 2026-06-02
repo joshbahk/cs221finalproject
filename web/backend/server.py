@@ -4,7 +4,6 @@ from pathlib import Path
 # file path putting root node 
 ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / "src"
-
 sys.path.insert(0, str(SRC))
 
 from fastapi import FastAPI
@@ -34,20 +33,23 @@ bot = AGENTS["random"]()
 env.reset()
 
 #pulls state from observation
+
+@app.get("/agents")
+def list_agents():
+    return {"agents": list(AGENTS.keys())}
+
+
 @app.get("/state")
 def get_state():
     obs = env.get_observation(0)
-
     return {
         "observation": obs.to_json(),
-        "legal_actions": [
-            action.to_json()
-            for action in env.legal_actions(0)
-        ],
+        "legal_actions": [action.to_json() for action in env.legal_actions(0)],
         "done": env.is_terminal(),
     }
 
 #resetting the game
+
 @app.post("/reset")
 def reset(agent: str = "random"):
     global bot
@@ -58,20 +60,16 @@ def reset(agent: str = "random"):
     return {"success": True}
 
 #taking an action
+
 @app.post("/action")
 def perform_action(action_data: dict):
-
-    action = Action.make(
-        action_data["kind"],
-        **action_data.get("params", {})
-    )
+    action = Action.make(action_data["kind"], **action_data.get("params", {}))
     env.step(action)
-    
 
     while not env.is_terminal() and env.state.current_player == 1:
         obs = env.get_observation(1)
         legal = env.legal_actions(1)
         bot_action = bot.choose_action(obs, legal)
         env.step(bot_action)
+
     return {"success": True}
- 
