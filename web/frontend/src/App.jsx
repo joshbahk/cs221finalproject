@@ -43,6 +43,7 @@ export default function App() {
     );
 
   const { observation } = game;
+  const gameInProgress = !game.done && game.observation.turn_count > 0;
   const replaceActions = game.legal_actions.filter(
     (a) => a.kind === "replace_self",
   );
@@ -63,6 +64,7 @@ export default function App() {
           selected={selectedAgent}
           onChange={setSelectedAgent}
           onStart={reset}
+          gameInProgress={gameInProgress}
         />
       </div>
       <Hand cards={observation.opponent_cards} label="Opponent" />
