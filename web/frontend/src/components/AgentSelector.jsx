@@ -34,7 +34,7 @@ export function AgentSelector({ selected, onChange, onStart, gameInProgress }) {
     setPendingAgent(selected);
   };
 
-  const agents = ["random", "expectimax"];
+  const agents = ["random", "expectimax", "montecarlo"];
 
   return (
     <>

@@ -11,7 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from cambio.env import CambioEnv
 from cambio.actions import Action
-from cambio.agents import RandomAgent, ExpectimaxAgent
+from cambio.agents import RandomAgent, ExpectimaxAgent, MonteCarloAgent
 from cambio.cards import card_value
 
 app = FastAPI()
@@ -26,11 +26,13 @@ app.add_middleware(
 
 AGENTS = {
     "random": lambda: RandomAgent(seed=42),
-    "expectimax": lambda: ExpectimaxAgent(depth=2, num_world_samples=5, seed=42),
+    "expectimax": lambda: ExpectimaxAgent(seed=42),
+    "montecarlo": lambda: MonteCarloAgent(seed=42),
 }
 
-env = CambioEnv(seed=42)
 bot = AGENTS["random"]()
+
+env = CambioEnv(seed=42)
 env.reset()
 
 
