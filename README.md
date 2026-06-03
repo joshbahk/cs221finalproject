@@ -23,3 +23,34 @@ Play against the placeholder random bot in the terminal:
 ```bash
 PYTHONPATH=src python3 -m cambio.cli
 ```
+
+## Running the Project
+
+To run the project locally, open two terminal windows from the project root directory.
+
+### Backend
+
+Start the FastAPI backend server:
+
+```bash
+uvicorn web.backend.server:app --reload
+```
+
+### Frontend
+
+In a second terminal, start the React frontend:
+
+```bash
+cd web/frontend
+npm install
+npm run dev
+```
+
+> Note: `npm install` is only required the first time you set up the project.
+
+### Accessing the Application
+
+Once both servers are running, open the URL displayed by Vite in your browser (typically `http://localhost:5173`).
+
+The frontend will communicate with the FastAPI backend running locally.
+
