@@ -554,3 +554,75 @@
 .help-power {
   color: var(--text);
 }
+.card {
+  width: 72px;
+  height: 108px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  background: #1e1e2e;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 6px;
+  box-sizing: border-box;
+  user-select: none;
+}
+
+.card--hidden {
+  background: #16213e;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  color: var(--text);
+}
+
+.card--red {
+  color: #e05c5c;
+}
+.card--black {
+  color: #e0e0e0;
+}
+
+.card-corner {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1;
+  gap: 1px;
+}
+
+.card-corner--bottom {
+  align-self: flex-end;
+  align-items: flex-end;
+  transform: rotate(180deg);
+}
+
+.card-corner-rank {
+  font-size: 15px;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.card-corner-suit {
+  font-size: 11px;
+  line-height: 1;
+}
+
+.card-center-suit {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 26px;
+  pointer-events: none;
+}
+
+.card {
+  position: relative;
+}
+
+.card--joker {
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+}

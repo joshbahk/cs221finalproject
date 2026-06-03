@@ -9,6 +9,14 @@ export function useGame() {
   const [log, setLog] = useState([]);
   const [selectedAgent, setSelectedAgent] = useState("random");
   const [acting, setActing] = useState(false);
+  const [revealedSlots, setRevealedSlots] = useState({ my: [], opponent: [] });
+
+  const revealTemporarily = (side, slots, ms = 3000) => {
+    setRevealedSlots((prev) => ({ ...prev, [side]: slots }));
+    setTimeout(() => {
+      setRevealedSlots((prev) => ({ ...prev, [side]: [] }));
+    }, ms);
+  };
 
   const fetchState = useCallback(async () => {
     try {
@@ -49,6 +57,16 @@ export function useGame() {
       await fetch(`${BASE}/reset?agent=${agent}`, { method: "POST" });
       setLog([`New game vs ${agent}`]);
       await fetchState();
+    },
+    [selectedAgent, fetchState],
+  );
+
+  const reset = useCallback(
+    async (agent = selectedAgent) => {
+      await fetch(`${BASE}/reset?agent=${agent}`, { method: "POST" });
+      setLog([`New game vs ${agent}`]);
+      await fetchState();
+      revealTemporarily("my", [0, 1], 3000);
     },
     [selectedAgent, fetchState],
   );
