@@ -284,3 +284,111 @@ class ExpectimaxAgent(Agent):
             action_values[action] = total_value / self.num_world_samples
 
         return max(action_values, key=action_values.get)
+
+
+def _greedy_rollout_action(env: CambioEnv, legal_actions, rng: random.Random):
+    """
+    Small heuristic for the search player's own moves inside a rollout. After drawing,
+    replace worst card if the drawn card beats it, otherwise discard.
+    Everything else stays random.
+    """
+    state = env.state
+    player_id = state.current_player
+
+    if state.phase in ("after_draw_deck", "after_draw_discard") and state.drawn_card is not None:
+        values = [card_value(card) for card in state.players[player_id].hand]
+        worst_slot = max(range(len(values)), key=lambda s: values[s])
+
+        if card_value(state.drawn_card) < values[worst_slot]:
+            for action in legal_actions:
+                if action.kind == "replace_self" and action.get("slot") == worst_slot:
+                    return action
+
+        for action in legal_actions:
+            if action.kind == "discard_drawn":
+                return action
+
+    return rng.choice(legal_actions)
+
+
+def rollout_value(
+    env: CambioEnv,
+    root_player: int,
+    rng: random.Random,
+    max_plies: int = 200,
+) -> float:
+    """
+    Monte Carlo rollout.
+
+    Instead of expansively exploring the tree, play one playout to the end and
+    return the result. The opponent plays randomly for our model and includes
+    greedy heuristic for better win rate.
+    """
+    plies = 0
+
+    while not env.is_terminal() and plies < max_plies:
+        current_player = env.state.current_player
+        legal_actions = env.legal_actions(current_player)
+
+        if not legal_actions:
+            break
+
+        if current_player == root_player:
+            action = _greedy_rollout_action(env, legal_actions, rng)
+        else:
+            action = rng.choice(legal_actions)
+
+        env.step(action)
+        plies += 1
+
+    if env.is_terminal():
+        return env.utilities()[root_player]
+
+    return evaluate_env(env, root_player)
+
+
+class MonteCarloAgent(Agent):
+    name = "montecarlo"
+
+    def __init__(
+        self,
+        num_world_samples: int = 30,
+        seed=None,
+    ):
+        self.num_world_samples = num_world_samples
+        self.rng = random.Random(seed)
+
+    def choose_action(self, observation, legal_actions):
+        """
+        Choose action with the highest average rollout value.
+
+        Similar to Expectimax, but uses Monte Carlo rollouts.
+        """
+        action_values = {}
+
+        for action in legal_actions:
+            total_value = 0.0
+            num_evaluated = 0
+
+            for _ in range(self.num_world_samples):
+                try:
+                    sampled_env = sample_env_from_observation(
+                        observation=observation,
+                        seed=self.rng.randint(0, 10**9),
+                    )
+                    sampled_env.step(action)
+                except Exception:
+                    continue
+
+                total_value += rollout_value(
+                    env=sampled_env,
+                    root_player=observation.player_id,
+                    rng=self.rng,
+                )
+                num_evaluated += 1
+
+            action_values[action] = (
+                total_value / num_evaluated if num_evaluated else float("-inf")
+            )
+
+        return max(action_values, key=action_values.get)

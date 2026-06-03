@@ -1,4 +1,4 @@
-from cambio.agents import ExpectimaxAgent, RandomAgent
+from cambio.agents import ExpectimaxAgent, MonteCarloAgent, RandomAgent
 
 
 AGENT_REGISTRY = {
@@ -9,6 +9,10 @@ AGENT_REGISTRY = {
     "expectimax": {
         "class": ExpectimaxAgent,
         "description": "Depth-limited expectimax agent with sampled hidden worlds.",
+    },
+    "montecarlo": {
+        "class": MonteCarloAgent,
+        "description": "Monte Carlo agent: sampled worlds evaluated by random rollouts.",
     },
 }
 
