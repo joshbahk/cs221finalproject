@@ -27,6 +27,7 @@ export default function App() {
       />
       <Hand cards={observation.my_cards} label="You" />
       <ActionPanel actions={game.legal_actions} onAction={takeAction} />
+      <GameLog log={log} />
     </div>
   );
 }

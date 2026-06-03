@@ -278,3 +278,20 @@
   border-color: var(--accent);
   background: var(--accent-bg);
 }
+.game-log {
+  width: 100%;
+  max-width: 400px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.log-entry {
+  font-family: var(--mono);
+  font-size: 13px;
+  padding: 2px 0;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
