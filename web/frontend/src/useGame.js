@@ -26,14 +26,20 @@ export function useGame() {
   const takeAction = useCallback(
     async (action) => {
       setActing(true);
-      await fetch(`${BASE}/action`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(action),
-      });
-      setLog((prev) => [`You: ${action.kind}`, ...prev].slice(0, 20));
-      await fetchState();
-      setActing(false);
+      try {
+        const res = await fetch(`${BASE}/action`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(action),
+        });
+        if (!res.ok) throw new Error(`Action failed: ${res.status}`);
+        setLog((prev) => [`You: ${action.kind}`, ...prev].slice(0, 20));
+        await fetchState();
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setActing(false);
+      }
     },
     [fetchState],
   );

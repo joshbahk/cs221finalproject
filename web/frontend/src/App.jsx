@@ -67,6 +67,14 @@ export default function App() {
           gameInProgress={gameInProgress}
         />
       </div>
+      {error && (
+        <div className="error-banner">
+          ⚠️ {error}
+          <button className="error-dismiss" onClick={() => setError(null)}>
+            ✕
+          </button>
+        </div>
+      )}
       <Hand cards={observation.opponent_cards} label="Opponent" />
       <TableCenter
         discardTop={observation.discard_top}
