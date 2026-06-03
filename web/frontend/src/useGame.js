@@ -57,15 +57,6 @@ export function useGame() {
       await fetch(`${BASE}/reset?agent=${agent}`, { method: "POST" });
       setLog([`New game vs ${agent}`]);
       await fetchState();
-    },
-    [selectedAgent, fetchState],
-  );
-
-  const reset = useCallback(
-    async (agent = selectedAgent) => {
-      await fetch(`${BASE}/reset?agent=${agent}`, { method: "POST" });
-      setLog([`New game vs ${agent}`]);
-      await fetchState();
       revealTemporarily("my", [0, 1], 3000);
     },
     [selectedAgent, fetchState],

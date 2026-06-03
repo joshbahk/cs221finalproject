@@ -21,6 +21,7 @@ export default function App() {
     setSelectedAgent,
     takeAction,
     reset,
+    revealedSlots,
   } = useGame();
 
   if (loading) return <p style={{ padding: 32 }}>Loading...</p>;
@@ -79,7 +80,11 @@ export default function App() {
           </button>
         </div>
       )}
-      <Hand cards={observation.opponent_cards} label="Opponent" />
+      <Hand
+        cards={observation.opponent_cards}
+        label="Opponent"
+        revealedSlots={revealedSlots.opponent}
+      />
       <TableCenter
         discardTop={observation.discard_top}
         deckSize={observation.deck_size}
@@ -94,6 +99,7 @@ export default function App() {
         actions={panelActions}
         onAction={takeAction}
         acting={acting}
+        revealedSlots={revealedSlots.my}
       />
       <GameLog log={log} />
     </div>
