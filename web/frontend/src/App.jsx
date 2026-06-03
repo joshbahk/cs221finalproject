@@ -3,11 +3,21 @@ import { Hand } from "./components/Hand";
 import { TableCenter } from "./components/TableCenter";
 import { ActionPanel } from "./components/ActionPanel";
 import { GameLog } from "./components/GameLog";
+import { AgentSelector } from "./components/AgentSelector";
 
 import "./App.css";
 
 export default function App() {
-  const { game, loading, error, log, takeAction } = useGame();
+  const {
+    game,
+    loading,
+    error,
+    log,
+    selectedAgent,
+    setSelectedAgent,
+    takeAction,
+    reset,
+  } = useGame();
 
   if (loading) return <p style={{ padding: 32 }}>Loading...</p>;
   if (error)
@@ -19,7 +29,14 @@ export default function App() {
 
   return (
     <div className="game">
-      <h1>Cambio</h1>
+      <div className="game-header">
+        <h1>Cambio</h1>
+        <AgentSelector
+          selected={selectedAgent}
+          onChange={setSelectedAgent}
+          onStart={reset}
+        />
+      </div>
       <Hand cards={observation.opponent_cards} label="Opponent" />
       <TableCenter
         discardTop={observation.discard_top}
