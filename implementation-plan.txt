@@ -10,7 +10,9 @@
 10. Add smoke_game.py.
 11. Add generate_dataset.py.
 12. Add evaluate_agents.py.
-13. Add make_figures.py.
-14. Add InformationSetMonteCarloAgent.
+
+
+13. **Add make_figures.py** (DID NOT GET TO)
+14. **Add InformationSetMonteCarloAgent** (DID NOT GET TO)
 15. Run final experiments.
 16. Write report from generated outputs.
