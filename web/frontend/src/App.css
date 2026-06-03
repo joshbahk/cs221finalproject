@@ -346,3 +346,81 @@
 .reset-btn:hover {
   border-color: var(--accent);
 }
+.action-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.acting-status {
+  width: 100%;
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--text);
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+.game-over {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 48px 32px;
+}
+
+.game-over-result {
+  font-size: 32px;
+  margin: 0;
+  color: var(--text-h);
+}
+
+.game-over-scores {
+  display: flex;
+  gap: 48px;
+}
+
+.score-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.score-value {
+  font-family: var(--mono);
+  font-size: 36px;
+  font-weight: bold;
+  color: var(--text-h);
+}
+.card-wrapper {
+  position: relative;
+  border-radius: 8px;
+}
+
+.card-wrapper--selectable {
+  cursor: pointer;
+  animation: glow 1.2s ease-in-out infinite;
+}
+
+.card-wrapper--selectable .card {
+  border-color: var(--accent);
+}
+
+@keyframes glow {
+  0%,
+  100% {
+    box-shadow: 0 0 6px 2px var(--accent);
+  }
+  50% {
+    box-shadow: 0 0 14px 6px var(--accent);
+  }
+}

@@ -8,6 +8,7 @@ export function useGame() {
   const [error, setError] = useState(null);
   const [log, setLog] = useState([]);
   const [selectedAgent, setSelectedAgent] = useState("random");
+  const [acting, setActing] = useState(false);
 
   const fetchState = useCallback(async () => {
     try {
@@ -24,6 +25,7 @@ export function useGame() {
 
   const takeAction = useCallback(
     async (action) => {
+      setActing(true);
       await fetch(`${BASE}/action`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -31,6 +33,7 @@ export function useGame() {
       });
       setLog((prev) => [`You: ${action.kind}`, ...prev].slice(0, 20));
       await fetchState();
+      setActing(false);
     },
     [fetchState],
   );

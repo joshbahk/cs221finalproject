@@ -12,6 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from cambio.env import CambioEnv
 from cambio.actions import Action
 from cambio.agents import RandomAgent, ExpectimaxAgent
+from cambio.cards import card_value
 
 app = FastAPI()
 
@@ -37,15 +38,24 @@ env.reset()
 def list_agents():
     return {"agents": list(AGENTS.keys())}
 
+def hand_score(player):
+    return sum(card_value(c) for c in player.hand if c is not None)
 
 @app.get("/state")
 def get_state():
     obs = env.get_observation(0)
-    return {
+    result = {
         "observation": obs.to_json(),
         "legal_actions": [action.to_json() for action in env.legal_actions(0)],
         "done": env.is_terminal(),
     }
+    if env.is_terminal():
+        from cambio.cards import card_value
+        result["scores"] = {
+        "you": hand_score(env.state.players[0]),
+        "opponent": hand_score(env.state.players[1]),
+        }
+    return result
 
 @app.post("/reset")
 def reset(agent: str = "random"):

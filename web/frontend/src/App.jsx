@@ -4,6 +4,7 @@ import { TableCenter } from "./components/TableCenter";
 import { ActionPanel } from "./components/ActionPanel";
 import { GameLog } from "./components/GameLog";
 import { AgentSelector } from "./components/AgentSelector";
+import { GameOver } from "./components/GameOver";
 
 import "./App.css";
 
@@ -13,6 +14,7 @@ export default function App() {
     loading,
     error,
     log,
+    acting,
     selectedAgent,
     setSelectedAgent,
     takeAction,
@@ -25,7 +27,33 @@ export default function App() {
       <p style={{ padding: 32 }}>Error: {error} — is the backend running?</p>
     );
 
+  if (game.done)
+    return (
+      <div className="game">
+        <div className="game-header">
+          <h1>Cambio</h1>
+          <AgentSelector
+            selected={selectedAgent}
+            onChange={setSelectedAgent}
+            onStart={reset}
+          />
+        </div>
+        <GameOver scores={game.scores} onReset={() => reset(selectedAgent)} />
+      </div>
+    );
+
   const { observation } = game;
+  const replaceActions = game.legal_actions.filter(
+    (a) => a.kind === "replace_self",
+  );
+  const selectableSlots = replaceActions.map((a) => a.params.slot);
+  const handleSlotSelect = (slot) => {
+    const action = replaceActions.find((a) => a.params.slot === slot);
+    if (action) takeAction(action);
+  };
+  const panelActions = game.legal_actions.filter(
+    (a) => a.kind !== "replace_self",
+  );
 
   return (
     <div className="game">
@@ -42,8 +70,17 @@ export default function App() {
         discardTop={observation.discard_top}
         deckSize={observation.deck_size}
       />
-      <Hand cards={observation.my_cards} label="You" />
-      <ActionPanel actions={game.legal_actions} onAction={takeAction} />
+      <Hand
+        cards={observation.my_cards}
+        label="You"
+        selectableSlots={selectableSlots}
+        onSelectSlot={handleSlotSelect}
+      />
+      <ActionPanel
+        actions={panelActions}
+        onAction={takeAction}
+        acting={acting}
+      />
       <GameLog log={log} />
     </div>
   );
