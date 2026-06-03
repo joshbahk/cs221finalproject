@@ -1,12 +1,6 @@
 import { Card } from "./Card";
 
-export function Hand({
-  cards,
-  label,
-  selectableSlots = [],
-  onSelectSlot,
-  revealedSlots = [],
-}) {
+export function Hand({ cards, label, selectableSlots = [], onSelectSlot }) {
   return (
     <div className="hand">
       <p className="hand-label">{label}</p>
@@ -17,7 +11,7 @@ export function Hand({
             className={`card-wrapper ${selectableSlots.includes(i) ? "card-wrapper--selectable" : ""}`}
             onClick={() => selectableSlots.includes(i) && onSelectSlot?.(i)}
           >
-            <Card card={revealedSlots.includes(i) ? cards[i] : null} />
+            <Card card={cards[i]} />
           </div>
         ))}
       </div>
