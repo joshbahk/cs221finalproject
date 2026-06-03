@@ -1,10 +1,13 @@
 import { useGame } from "./useGame";
 import { Hand } from "./components/Hand";
 import { TableCenter } from "./components/TableCenter";
+import { ActionPanel } from "./components/ActionPanel";
+import { GameLog } from "./components/GameLog";
+
 import "./App.css";
 
 export default function App() {
-  const { game, loading, error } = useGame();
+  const { game, loading, error, log, takeAction } = useGame();
 
   if (loading) return <p style={{ padding: 32 }}>Loading...</p>;
   if (error)
@@ -23,6 +26,7 @@ export default function App() {
         deckSize={observation.deck_size}
       />
       <Hand cards={observation.my_cards} label="You" />
+      <ActionPanel actions={game.legal_actions} onAction={takeAction} />
     </div>
   );
 }
