@@ -5,6 +5,7 @@ import { ActionPanel } from "./components/ActionPanel";
 import { GameLog } from "./components/GameLog";
 import { AgentSelector } from "./components/AgentSelector";
 import { GameOver } from "./components/GameOver";
+import { HelpPanel } from "./components/HelpPanel";
 
 import "./App.css";
 
@@ -13,6 +14,7 @@ export default function App() {
     game,
     loading,
     error,
+    setError,
     log,
     acting,
     selectedAgent,
@@ -37,6 +39,7 @@ export default function App() {
             onChange={setSelectedAgent}
             onStart={reset}
           />
+          <HelpPanel />
         </div>
         <GameOver scores={game.scores} onReset={() => reset(selectedAgent)} />
       </div>
@@ -66,6 +69,7 @@ export default function App() {
           onStart={reset}
           gameInProgress={gameInProgress}
         />
+        <HelpPanel />
       </div>
       {error && (
         <div className="error-banner">

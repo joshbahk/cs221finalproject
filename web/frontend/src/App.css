@@ -205,8 +205,9 @@
   color: var(--text);
 }
 
-.hand-cards {
-  display: flex;
+.hand-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 12px;
 }
 
@@ -459,4 +460,97 @@
 .modal-actions {
   display: flex;
   gap: 12px;
+}
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--code-bg);
+  border: 2px solid #e05c5c;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: #e05c5c;
+  width: 100%;
+  max-width: 600px;
+}
+
+.error-dismiss {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: #e05c5c;
+  cursor: pointer;
+  font-size: 16px;
+}
+.help-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: var(--bg);
+  color: var(--text-h);
+  font-family: var(--mono);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.help-btn:hover {
+  border-color: var(--accent);
+}
+
+.modal--wide {
+  max-width: 480px;
+}
+
+.modal-title {
+  font-size: 20px;
+  margin: 0;
+  color: var(--text-h);
+}
+
+.help-subtitle {
+  font-size: 15px;
+  margin: 0;
+  color: var(--text-h);
+  align-self: flex-start;
+}
+
+.help-text {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--text);
+  margin: 0;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.help-table {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.help-row {
+  display: flex;
+  gap: 16px;
+  font-family: var(--mono);
+  font-size: 13px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.help-cards {
+  width: 80px;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.help-power {
+  color: var(--text);
 }
